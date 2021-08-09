@@ -28,9 +28,9 @@ export default class PriceDataModuleInitializer {
         //     let parentWindow = window.opener;
         //     service = parentWindow.window.appGlobal.multiScreen.parentgetService('price');
         // } else {
-            service = this.createService();
+        service = this.createService();
         // }
-console.log("service", service);
+        console.log("service", service);
         this.priceService = service;
         registerService(service.subscriptionKey, service);
 
@@ -42,7 +42,7 @@ console.log("service", service);
         // this._loadConfigs();
         // this._loadPriceUserSettings();
         // this._setAuthParams();
-        // this._setConnectionSettings();
+        this._setConnectionSettings();
         // this._loadPriceUser();
         // this._populateExchangeMetadata();
         // this._loadPriceUserData();

@@ -16,7 +16,7 @@ export default class SocketResponseHandler {
     * @param onSocketReady Callback function to notify whether communication path established for data transfer
     */
     onMessage (response, onSocketReady) {
-        this.inputQueue.enqueue(response);
+        this.inputQueue.push(response);
         this.onSocketReady = onSocketReady; // TODO: [Bashitha] Find a way to pass only once at initialization
     }
 
@@ -24,8 +24,8 @@ export default class SocketResponseHandler {
     * Processes response from the server
     */
     processResponse () {
-        while (this.inputQueue.getLength() > 0) {
-            let frameBuffer = this.inputQueue.dequeue();
+        while (this.inputQueue.length > 0) {
+            let frameBuffer = this.inputQueue.pop();
 
             utils.logger.logDebug('Received frame : ' + frameBuffer);
             utils.logger.logDebug('Previous frame : ' + this.previousFrame);

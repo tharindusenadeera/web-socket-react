@@ -12,7 +12,7 @@ export default (function () {
         if (isWebReqAllowed) {
             sendRequest(param);
         } else {
-            pendingRequestQueue.enqueue(param);
+            pendingRequestQueue.push(param);
         }
     };
 
@@ -78,8 +78,8 @@ export default (function () {
     };
 
     let sendPendingRequest = function () {
-        while (pendingRequestQueue.getLength() > 0) {
-            sendRequest(pendingRequestQueue.dequeue());
+        while (pendingRequestQueue.length > 0) {
+            sendRequest(pendingRequestQueue.pop());
         }
     };
 

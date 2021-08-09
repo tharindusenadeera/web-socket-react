@@ -6,13 +6,13 @@ import TinyQueue from 'tinyqueue';
 export default function () {
     this.analyticInterval = 30000; // 30 seconds - Sending analytics requests by this interval
     this.requestCountPerCycle = 5; // Sending this much of analytics requests per single iteration
-    this.analyticQueue = new new TinyQueue();
+    this.analyticQueue = new  TinyQueue();
 
     let that = this;
 
     let trackPage = function (page, title) {
         try {
-            that.analyticQueue.enqueue({type: 'pageview', args: {'page': page, 'title': title}});
+            that.analyticQueue.push({type: 'pageview', args: {'page': page, 'title': title}});
         } catch (e) {
             utils.logger.logError('Analytics Service track page error: ' + e);
         }
@@ -20,7 +20,7 @@ export default function () {
 
     let trackEvent = function (category, action, label) {
         try {
-            that.analyticQueue.enqueue({type: 'event', args: {category: category, action: action, label: label}});
+            that.analyticQueue.push({type: 'event', args: {category: category, action: action, label: label}});
         } catch (e) {
             utils.logger.logError('Analytics Service track event error: ' + e);
         }
@@ -66,8 +66,8 @@ export default function () {
     let _sendAnalytics = function () {
         let sentCount = 0;
 
-        while (sentCount <= that.requestCountPerCycle && that.analyticQueue.getLength() > 0) {
-            let trackMsg = that.analyticQueue.dequeue();
+        while (sentCount <= that.requestCountPerCycle && that.analyticQueue.length > 0) {
+            let trackMsg = that.analyticQueue.pop();
             sentCount++;
 
             switch (trackMsg.type) {

@@ -209,10 +209,10 @@ export default function (requestHandler, PriceSocketResponseHandler, service, su
 
     let clearConnection = function (connectionType) {
         let dataQueue = getSocketConnection(connectionType).getDataQueue();
-        let queueLength = dataQueue.getLength();
+        let queueLength = dataQueue.length;
 
         for (let i = 0; i < queueLength; i++) {
-            that.pendingQueue.enqueue(dataQueue.dequeue());
+            that.pendingQueue.push(dataQueue.pop());
         }
 
         closeConnection(connectionType);
@@ -221,10 +221,10 @@ export default function (requestHandler, PriceSocketResponseHandler, service, su
 
     let setPendingData = function (connectionType) {
         let socket = getSocketConnection(connectionType);
-        let queueLength = that.pendingQueue.getLength();
+        let queueLength = that.pendingQueue.length;
 
         for (let i = 0; i < queueLength; i++) {
-            socket.sendData(that.pendingQueue.dequeue());
+            socket.sendData(that.pendingQueue.pop());
         }
     };
 

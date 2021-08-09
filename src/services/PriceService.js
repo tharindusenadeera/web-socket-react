@@ -105,8 +105,8 @@ export default class PriceService {
         this.isExchangeSummaryMetaReady = false;
         this.isDefaultMetaRequestFail = false;
         this.isAuthSuccess = false;
-        this.mixReqQueue = new TinyQueue();;
-        this.socketReqQueue = new TinyQueue();;
+        this.mixReqQueue = new TinyQueue();
+        this.socketReqQueue = new TinyQueue();
         this.isAuthResponse = false;
         this.changePasswordCallback = {};
 
@@ -320,7 +320,6 @@ export default class PriceService {
     *                      authFailed  : Auth failure function. Mandatory.
     */
     authenticateWithUsernameAndPassword (authParams) {
-        console.log("authParams", authParams);
         try {
             authParams.authSuccess = this._modifyAuthSuccess(authParams);
             authParams.authFailed = this._modifyAuthFailed(authParams);
@@ -328,6 +327,8 @@ export default class PriceService {
             utils.logger.logInfo('Authenticating price retail user...');
 
             let req = priceSocketRequestHandler.generateRetailAuthRequest(authParams);
+            console.log("---- Auth req ----");
+            console.log(req);
             this.webSocketManager.sendAuth(req, PriceConstants.SocketConnectionType.QuoteServer, authParams);
 
         } catch (e) {
@@ -476,7 +477,7 @@ export default class PriceService {
             if (this.isPriceMetadataReady()) {
                 this._addFullMarketSymbolRequest(exchange, subMarketId);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._addFullMarketSymbolRequest,
                     args: [exchange, subMarketId] // Queue arguments as an array
                 });
@@ -603,7 +604,7 @@ export default class PriceService {
             if (this.isAuthenticated()) {
                 this._sendMarketDepthByPriceRequest(exchange, symbol);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendMarketDepthByPriceRequest,
                     args: [exchange, symbol] // Queue arguments as an array
                 });
@@ -628,7 +629,7 @@ export default class PriceService {
             if (this.isAuthenticated()) {
                 this._sendMarketDepthByOrderRequest(exchange, symbol);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendMarketDepthByOrderRequest,
                     args: [exchange, symbol] // Queue arguments as an array
                 });
@@ -653,7 +654,7 @@ export default class PriceService {
             if (this.isPriceMetadataReady()) {
                 this._sendIntraDayChartRequest(exchange, symbol);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendIntraDayChartRequest,
                     args: [exchange, symbol] // Queue arguments as an array
                 });
@@ -678,7 +679,7 @@ export default class PriceService {
             if (this.isPriceMetadataReady()) {
                 this._sendTOPVIntraDayChartRequest(exchange, symbol);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendTOPVIntraDayChartRequest,
                     args: [exchange, symbol] // Queue arguments as an array
                 });
@@ -754,7 +755,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendTimeAndSalesRequest(exchange, symbol, isShowBuyerSeller);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendTimeAndSalesRequest,
                     args: [exchange, symbol, isShowBuyerSeller] // Queue arguments as an array
                 });
@@ -767,7 +768,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendCalenderEventMixRequest(exchange, callbackFn);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendCalenderEventMixRequest,
                     args: [exchange] // Queue arguments as an array
                 });
@@ -780,7 +781,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendYoutubeEventMixRequest(nextPageUrl, callbackFn);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendYoutubeEventMixRequest,
                     args: [nextPageUrl] // Queue arguments as an array
                 });
@@ -793,7 +794,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendInstagramEventMixRequest();
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendInstagramEventMixRequest,
                     args: [exchange] // Queue arguments as an array
                 });
@@ -806,7 +807,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendFacebookEventMixRequest(nextPageUrl, callbackFn);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendFacebookEventMixRequest,
                     args: [nextPageUrl, callbackFn] // Queue arguments as an array
                 });
@@ -823,7 +824,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendPressReleaseMixRequest();
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendPressReleaseMixRequest,
                     args: [exchange] // Queue arguments as an array
                 });
@@ -849,7 +850,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendMarketTimeAndSalesRequest(exchange);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendMarketTimeAndSalesRequest,
                     args: [exchange] // Queue arguments as an array
                 });
@@ -981,7 +982,7 @@ export default class PriceService {
         if (this.isPriceMetadataReady()) {
             mixRequestHandler.loadGmsSummary();
         } else {
-            this.mixReqQueue.enqueue({
+            this.mixReqQueue.push({
                 callbackFn: mixRequestHandler.loadGmsSummary
             });
         }
@@ -1139,12 +1140,12 @@ export default class PriceService {
         //         numberOfDays = params.chartDataLevel === ChartConstants.ChartDataLevel.IntradayCurrentDay ?
         //             ChartConstants.ChartDataLevel.IntradayCurrentDay : ChartConstants.ChartDataLevel.IntradayFiveDay;
 
-        //         this.mixReqQueue.enqueue({
+        //         this.mixReqQueue.push({
         //             callbackFn: mixRequestHandler.loadIntradayData,
         //             args: [params.exchange, params.symbol, numberOfDays, params.chartType, params.reqSuccessFn, params.reqFailureFn] // Queue arguments as an array
         //         });
         //     } else {
-        //         this.mixReqQueue.enqueue({
+        //         this.mixReqQueue.push({
         //             callbackFn: mixRequestHandler.loadChartData,
         //             args: [params.exchange, params.symbol, ChartConstants.ChartCategory.Intraday, params.begin, params.chartType, params.reqSuccessFn, params.reqFailureFn] // Queue arguments as an array
         //         });
@@ -1166,12 +1167,12 @@ export default class PriceService {
         //         numberOfDays = params.chartDataLevel === ChartConstants.ChartDataLevel.IntradayCurrentDay ?
         //             ChartConstants.ChartDataLevel.IntradayCurrentDay : ChartConstants.ChartDataLevel.IntradayFiveDay;
 
-        //         this.mixReqQueue.enqueue({
+        //         this.mixReqQueue.push({
         //             callbackFn: mixRequestHandler.loadTOPVIntradayData,
         //             args: [params.exchange, params.symbol, numberOfDays, params.reqSuccessFn, params.reqFailureFn] // Queue arguments as an array
         //         });
         //     } else {
-        //         this.mixReqQueue.enqueue({
+        //         this.mixReqQueue.push({
         //             callbackFn: mixRequestHandler.loadTOPVChartData,
         //             args: [params.exchange, params.symbol, ChartConstants.ChartCategory.Intraday, params.begin, params.reqSuccessFn, params.reqFailureFn] // Queue arguments as an array
         //         });
@@ -1225,7 +1226,7 @@ export default class PriceService {
             if (this.isAuthenticated() && this.isPriceMetadataReady()) {
                 this._sendTimeAndSalesMixRequest(exchange, symbol, endSequence, pgs);
             } else {
-                this.mixReqQueue.enqueue({
+                this.mixReqQueue.push({
                     callbackFn: this._sendTimeAndSalesMixRequest,
                     args: [exchange, symbol, endSequence, pgs] // Queue arguments as an array
                 });
@@ -1372,7 +1373,7 @@ export default class PriceService {
             if (this.isPriceMetadataReady()) {
                 this._sendIntraDayTechScoreRequest(exchange, symbol);
             } else {
-                this.socketReqQueue.enqueue({
+                this.socketReqQueue.push({
                     callbackFn: this._sendIntraDayTechScoreRequest,
                     args: [exchange, symbol]
                 });
@@ -1482,18 +1483,18 @@ export default class PriceService {
     }
 
     _sendQueuedMixSocketRequest () {
-        while (this.mixReqQueue.getLength() > 0) {
+        while (this.mixReqQueue.length > 0) {
             // Get queued request
-            let mixReqObj = this.mixReqQueue.dequeue();
+            let mixReqObj = this.mixReqQueue.pop();
 
             // Call queued function
             // Pass-in queued arguments as an array, but use as properties inside callback function
             mixReqObj.callbackFn.apply(this, mixReqObj.args);
         }
 
-        while (this.socketReqQueue.getLength() > 0) {
+        while (this.socketReqQueue.length > 0) {
             // Get queued request
-            let socketReqObj = this.socketReqQueue.dequeue();
+            let socketReqObj = this.socketReqQueue.pop();
 
             // Call queued function
             // Pass-in queued arguments as an array, but use as properties inside callback function

@@ -4,6 +4,7 @@ import * as sharedService from '../Shared/SharedServices';
 // import ChartConstants from '../../../../../ua-kernal/models/chart/chart-constants';
 import utils from '../../util/utils/utils';
 import AppConfig from '../config/AppConfig';
+import TinyQueue from 'tinyqueue';
 // import languageDataStore from '../../../../../ua-kernal/models/shared/language/language-data-store';
 // import reduxStore from '../../../../../utils/reduxStore';
 // import PriceUser from '../../business-entities/price-user';
@@ -16,7 +17,7 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
         super(callbacks);
         let that = this;
         this.callbacks = callbacks;
-        this.inputQueue = new window.Queue();
+        this.inputQueue = new TinyQueue();
         this.processTimer = setTimeout(function () {
             that.processResponse();
         }, PriceConstants.TimeIntervals.WebSocketInQueueProcessingInterval);

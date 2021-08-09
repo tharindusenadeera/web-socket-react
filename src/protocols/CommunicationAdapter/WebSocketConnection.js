@@ -1,5 +1,6 @@
 import PriceConstants from '../../constants/Price/PriceConstants';
 import utils from '../../util/utils/utils';
+import TinyQueue from 'tinyqueue';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default function (socketParams) {
@@ -8,9 +9,9 @@ export default function (socketParams) {
     this.webSocket = undefined;
     this.connectionPath = '';
 
-    this.preAuthQueue = new window.Queue();
-    this.authQueue = new window.Queue();
-    this.dataQueue = new window.Queue();
+    this.preAuthQueue = new TinyQueue();
+    this.authQueue = new TinyQueue();
+    this.dataQueue = new TinyQueue();
 
     this.isConnectedToServer = false;
     this.isAuthenticated = false;
@@ -31,8 +32,8 @@ export default function (socketParams) {
     };
 
     let sendAuth = function (authRequest) {
-        if (that.authQueue.getLength() === 0) {
-            that.authQueue.enqueue(authRequest);
+        if (that.authQueue.length === 0) {
+            that.authQueue.push(authRequest);
             utils.logger.logInfo('Authenticating user - request queued to send');
         }
 
@@ -47,13 +48,13 @@ export default function (socketParams) {
     let sendData = function (dataRequest) {
 
         if (!(dataRequest === null || dataRequest.length === 0)) {
-            that.dataQueue.enqueue(dataRequest);
+            that.dataQueue.push(dataRequest);
         }
     };
 
     let sendPreAuthData = function (dataRequest) {
         if (!(dataRequest === null || dataRequest.length === 0)) {
-            that.preAuthQueue.enqueue(dataRequest);
+            that.preAuthQueue.push(dataRequest);
         }
 
         if (!that.webSocket) {
@@ -176,8 +177,8 @@ export default function (socketParams) {
 
     let _sendMessage = function (messageQueue, isLog) {
 
-        while (messageQueue.getLength() > 0) {
-            let message = messageQueue.dequeue();
+        while (messageQueue.length > 0) {
+            let message = messageQueue.pop();
             that.webSocket.send(message);
 
             utils.logger.logDebug('Message sent to server : ' + message);
@@ -256,12 +257,12 @@ export default function (socketParams) {
     let _flushOutQueues = function () {
         // Flush the out queues
         // TODO: [Bashitha] Implement the flush feature in the Queue library
-        while (that.dataQueue.getLength() > 0) {
-            that.dataQueue.dequeue();
+        while (that.dataQueue.length > 0) {
+            that.dataQueue.pop();
         }
 
-        while (that.authQueue.getLength() > 0) {
-            that.authQueue.dequeue();
+        while (that.authQueue.length > 0) {
+            that.authQueue.pop();
         }
     };
 

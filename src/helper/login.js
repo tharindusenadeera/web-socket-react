@@ -12,9 +12,9 @@ export default class Login {
     authenticateUser(username, password, allowInit, authSuccess, authFail) {
         let that = this;
         let priceService = getService('price');
-console.log("priceService", priceService);
-        this.onLoginEvent(username);
-        authSuccess(username, password, allowInit);
+
+        // this.onLoginEvent(username);
+        // authSuccess(username, password, allowInit);
 
         priceService.authenticateWithUsernameAndPassword({
             username: username,
