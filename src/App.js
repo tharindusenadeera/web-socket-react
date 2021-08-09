@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import "./App.css";
 import Login from "./helper/login";
 import PriceDataModuleInitializer from "./helper/price-data-module-initializer";
+import storeWithPersistor from './util/store/reduxStore';
 
 let username = 'bkuser';
 let password = '25d55ad283aa400af464c76d713c07ad';
@@ -47,7 +50,16 @@ export const App = () => {
     login.prepareLoginView(username, password);
   };
 
-  return <div className="App">
-
-  </div>;
+  return (
+      <Provider store={ storeWithPersistor.store }>
+        <PersistGate
+            persistor={ storeWithPersistor.persistor }
+            loading={ null }
+            debug>
+          <div className="App">
+            <p>Hi</p>
+          </div>
+        </PersistGate>
+      </Provider>
+  );
 };

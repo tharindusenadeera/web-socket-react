@@ -5,11 +5,11 @@ import * as sharedService from '../Shared/SharedServices';
 import utils from '../../util/utils/utils';
 import AppConfig from '../config/AppConfig';
 import TinyQueue from 'tinyqueue';
-// import languageDataStore from '../../../../../ua-kernal/models/shared/language/language-data-store';
-// import reduxStore from '../../../../../utils/reduxStore';
-// import PriceUser from '../../business-entities/price-user';
-// import { saveUser } from '../../../../actions/UserActions';
-// import { setLoginStatus, saveExchange, saveStock, saveCurrentExchange } from '../../../../actions';
+import languageDataStore from '../../protocols/Shared/language/language-data-store';
+import reduxStore from '../../util/store/reduxStore';
+import PriceUser from '../../business-entities/price-user';
+import { saveUser } from '../../actions/UserActions';
+import { setLoginStatus, saveExchange, saveStock, saveCurrentExchange } from '../../actions';
 
 
 export default class PriceSocketResponseHandler extends SocketResponseHandler{
@@ -265,7 +265,7 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
                     cd : typeof message.cd !== 'undefined' ? message.cd :indexObj.cd ,
                 }
             }
-            // reduxStore.store.dispatch(saveStock(data));
+            reduxStore.store.dispatch(saveStock(data));
     }
 
     _processIndexResponse (message) {
@@ -391,7 +391,7 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
                 cd : typeof message.cd !== 'undefined' ? message.cd :indexObj.cd ,
             }
         }
-        // reduxStore.store.dispatch(saveStock(data));
+        reduxStore.store.dispatch(saveStock(data));
 
 
         // let existingStockObj = reduxStore.store.getState().stock.stocks.stockData;
@@ -465,18 +465,18 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
         let stockObj = sharedService.getService('price').stockDS.getStock(message.exg, message.sym, utils.AssetTypes.Indices);
         stockObj.symbolObj = exchangeObj;
 
-        // let existingStockObj = reduxStore.store.getState().stock.stocks.stockData;
-        // existingStockObj[key] = stockObj;
+        let existingStockObj = reduxStore.store.getState().stock.stocks.stockData;
+        existingStockObj[key] = stockObj;
 
 
         // reduxStore.store.dispatch(saveStock(existingStockObj));
 
-        // let existingExchange = reduxStore.store.getState().exchangeStore.exchangeData;
+        let existingExchange = reduxStore.store.getState().exchangeStore.exchangeData;
 
-        // existingExchange[message.exg] = exchangeObj;
-        // tempExg[message.exg] = exchangeObj;
-        // reduxStore.store.dispatch(saveExchange(existingExchange));
-        // reduxStore.store.dispatch(saveCurrentExchange(tempExg));
+        existingExchange[message.exg] = exchangeObj;
+        tempExg[message.exg] = exchangeObj;
+        reduxStore.store.dispatch(saveExchange(existingExchange));
+        reduxStore.store.dispatch(saveCurrentExchange(tempExg));
 
 
     }
@@ -616,19 +616,19 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
         if (message.AUTHSTAT > 0) {
             utils.logger.logInfo('Price user authenticated successfully.');
 
-            // reduxStore.store.dispatch(setLoginStatus());
+            reduxStore.store.dispatch(setLoginStatus());
             authSuccess = true;
 
-            // let savedPriceUserData = priceService.userDS;
+            let savedPriceUserData = priceService.userDS;
 
-            // // // window.appGlobal.priceUser = {delayedExchanges: savedPriceUserData ? savedPriceUserData.delayedExchg : []};
-            // // // window.appGlobal.priceUser = {prevDayExchanges: savedPriceUserData ? savedPriceUserData.prevDayExchg : []};
+            window.appGlobal.priceUser = {delayedExchanges: savedPriceUserData ? savedPriceUserData.delayedExchg : []};
+            window.appGlobal.priceUser = {prevDayExchanges: savedPriceUserData ? savedPriceUserData.prevDayExchg : []};
 
             let messageObj = this._setUserExchanges(message);
             messageObj = this._setWindowTypes(messageObj);
 
             let userData = {
-                // cacheKey: 'priceUser',
+                cacheKey: 'priceUser',
                 isEncrypt: true,
                 oneDayInMillis: 86400000, // 1000 * 60 * 60 * 24
 
@@ -651,14 +651,14 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
                 nonDefExg: messageObj.NDE, // Only non-default exchanges
                 isMultipleUserExchangesAvailable: false,
             }
-            //  let userObj = new PriceUser(userData);
+             let userObj = new PriceUser(userData);
 
-            // reduxStore.store.dispatch(saveUser(userObj));
+            reduxStore.store.dispatch(saveUser(userObj));
             // priceService.userDS.setData(messageObj, true);
             // priceService.userDS.save();
 
 
-            // window.appGlobal.logger = {postAuthPriceUser: utils.jsonHelper.convertToJson(reduxStore.store.getState().user.userData)};
+            window.appGlobal.logger = {postAuthPriceUser: utils.jsonHelper.convertToJson(reduxStore.store.getState().user.userData)};
         } else {
             if (message.AUTHSTAT === PriceConstants.AuthStatus.ForceChangePassword) {
                 message.SID = '';
@@ -802,15 +802,15 @@ export default class PriceSocketResponseHandler extends SocketResponseHandler{
     _processChangePassword (message) {
         let callbackFn = sharedService.getService('price').changePasswordCallback;
         let rejectedReason = message.chgPwdMsg ? message.chgPwdMsg : 'passwordChangeFail';
-        // let currentLangObj = languageDataStore.getLanguageObj().lang;
+        let currentLangObj = languageDataStore.getLanguageObj().lang;
 
-        // if (currentLangObj) {
-        //     rejectedReason = currentLangObj.messages[rejectedReason];
-        // }
+        if (currentLangObj) {
+            rejectedReason = currentLangObj.messages[rejectedReason];
+        }
 
-        // if (callbackFn && callbackFn instanceof Function) {
-        //     callbackFn(message.AUTHSTAT, rejectedReason);
-        // }
+        if (callbackFn && callbackFn instanceof Function) {
+            callbackFn(message.AUTHSTAT, rejectedReason);
+        }
     }
 
     _processAlertResponse (message) {

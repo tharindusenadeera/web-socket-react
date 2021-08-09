@@ -1,7 +1,7 @@
 import WebSocketConnection from './WebSocketConnection';
 import utils from '../../util/utils/utils';
-// import reduxStore from '../../../../utils/reduxStore';
-// import {saveConnectionSettings} from "../../../../ua-price/actions";
+import reduxStore from '../../util/store/reduxStore';
+import {saveConnectionSettings} from "../../actions";
 import TinyQueue from 'tinyqueue';
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -72,8 +72,8 @@ export default function (requestHandler, PriceSocketResponseHandler, service, su
 
     let setConnectionSettings = function (connectionSettings) {
         that.connectionSettings = Object.assign({}, that.connectionSettings, connectionSettings);
-        // reduxStore.store.dispatch(saveConnectionSettings(that.connectionSettings));
 
+        reduxStore.store.dispatch(saveConnectionSettings(that.connectionSettings));
     };
 
     let _sendReconnectAuth = function (authRequest, connectionType, authSuccess, isSecAuth) {
